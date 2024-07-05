@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Synonyms App</title>
+</head>
+<body>
+  <h1>Synonyms App</h1>
+  <form id="searchForm">
+    <input type="text" name="word" placeholder="Enter a word" required>
+    <button type="submit">Search</button>
+  </form>
+  <div id="results"></div>
+
+  <script>
+    document.getElementById('searchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const word = e.target.word.value;
+      try {
+        const response = await fetch('/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `word=${word}`
+        });
+        const data = await response.json();
+        const resultsDiv = document.getElementById('results');
+        if (data.synonyms && data.synonyms.length > 0) {
+          resultsDiv.innerHTML = `<h2>Synonyms for "${data.word}":</h2><ul>${data.synonyms.map(s => `<li>${s}</li>`).join('')}</ul>`;
+        } else {
+          resultsDiv.innerHTML = `<p>No synonyms found for "${data.word}".</p>`;
+        }
+      } catch (error) {
+        console.error('Error fetching synonyms:', error);
+        document.getElementById('results').innerHTML = `<p>Error retrieving synonyms. Please try again later.</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
